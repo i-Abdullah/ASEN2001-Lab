@@ -1,0 +1,62 @@
+Reaction number: 1 
+Magnitude: 0.0000 
+Type: F 
+Direction (xyz): 1 0 0
+
+Reaction number: 2 
+Magnitude: 0.0000 
+Type: F 
+Direction (xyz): 0 1 0
+
+Reaction number: 3 
+Magnitude: 750.0000 
+Type: F 
+Direction (xyz): 0 0 1
+
+Reaction number: 4 
+Magnitude: -0.0000 
+Type: F 
+Direction (xyz): 1 0 0
+
+Reaction number: 5 
+Magnitude: -450.0000 
+Type: F 
+Direction (xyz): 0 0 1
+
+Reaction number: 6 
+Magnitude: 600.0000 
+Type: F 
+Direction (xyz): 0 0 1
+
+------------(THE PROBLEM SETUP IS BELOW!!)------------ 
+
+# number of external forces and moments 
+1   0   
+# coordinates of the points at which external forces are applied 
+# x    y    z 
+-0.4  0.4   0.0  
+# magnitude and direction of external forces 
+# F   dx   dy    dz 
+900  0.0  0.0  -900 
+# location at which external couple moments are applied 
+# x    y    z 
+0.0 0.0 0.0  
+# magnitude and direction of external couple moments 
+# M   ux    uy   uz 
+0.0 0.0 0.0 0.0  
+# location of supports 
+# x    y    z 
+0.0   0.0  0.0 
+0.0   0.0  0.0 
+0.0   0.0  0.0 
+0.0   0.8  0.0 
+0.0   0.8  0.0 
+-0.6  1.2  0.0 
+# type (F/M) and direction of reaction  
+# type  dx    dy    uz 
+F      1.0    0.0   0.0 
+F      0.0    1.0   0.0 
+F      0.0    0.0   1.0 
+F      1.0    0.0   0.0  
+F      0.0    0.0   1.0  
+F      0.0    0.0   1.0  
