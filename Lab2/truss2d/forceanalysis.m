@@ -22,7 +22,7 @@ numreact  = size(reacjoints,1);
 numloads  = size(loadjoints,1);
 
 % number of equations
-numeqns = 2 * numjoints;
+numeqns = 3 * numjoints;
 
 % allocate arrays for linear system
 Amat = zeros(numeqns);
@@ -33,8 +33,10 @@ bvec = zeros(numeqns,1);
 for i=1:numjoints
     
    % equation id numbers
-   idx = 2*i-1;
+   idx = (2*i)-1;
    idy = 2*i;
+   idz = (2*i)+1;
+
    
    % get all bars connected to joint
    [ibar,ijt]=find(connectivity==i);
@@ -52,6 +54,7 @@ for i=1:numjoints
        else
            jid = connectivity(barid,1);
        end
+       
        joint_j = joints(jid,:);
        
        % compute unit vector pointing away from joint i
@@ -59,7 +62,7 @@ for i=1:numjoints
        uvec   = vec_ij/norm(vec_ij);
        
        % add unit vector into Amat
-       Amat([idx idy],barid)=uvec;
+       Amat([idx idy ],barid)=uvec;
    end
 end
 
@@ -86,6 +89,7 @@ for i=1:numloads
     % equation id numbers
     idx = 2*jid-1;
     idy = 2*jid;
+    idz = 2*jid+1;
 
     % add unit vector into bvec (sign change)
     bvec([idx idy])=-loadvecs(i,:);
