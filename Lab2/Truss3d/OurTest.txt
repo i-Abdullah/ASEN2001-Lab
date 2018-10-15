@@ -1,7 +1,7 @@
 3-D Truss analysis
 ------------------
 
-Date: 15-Oct-2018 08:25:10
+Date: 15-Oct-2018 08:29:45
 
 Input file: test3d_1.txt
 
