@@ -21,7 +21,7 @@ function writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivi
 fid=fopen(outputfile,'w');
 
 % write header
-fprintf(fid,'2-D Truss analysis\n');
+fprintf(fid,'3-D Truss analysis\n');
 fprintf(fid,'------------------\n\n');
 fprintf(fid,'Date: %s\n\n',datestr(now));
 

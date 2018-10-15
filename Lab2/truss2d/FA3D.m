@@ -33,10 +33,9 @@ bvec = zeros(numeqns,1);
 for i=1:numjoints
     
    % equation id numbers
-   idx = (2*i)-1;
-   idy = 2*i;
-   idz = (2*i)+1;
-
+   idx = 3*i-2;
+   idy = 3*i-1;
+   idz = 3*i;
    
    % get all bars connected to joint
    [ibar,ijt]=find(connectivity==i);
@@ -53,16 +52,18 @@ for i=1:numjoints
            jid = connectivity(barid,2);
        else
            jid = connectivity(barid,1);
+          
        end
-       
        joint_j = joints(jid,:);
+       
+       %joint_k = joints(,:);
        
        % compute unit vector pointing away from joint i
        vec_ij = joint_j - joint_i;
        uvec   = vec_ij/norm(vec_ij);
        
        % add unit vector into Amat
-       Amat([idx idy ],barid)=uvec;
+       Amat([idx idy idz],barid)=uvec;
    end
 end
 
@@ -73,11 +74,12 @@ for i=1:numreact
     jid=reacjoints(i);
 
     % equation id numbers
-    idx = 2*jid-1;
-    idy = 2*jid;
+    idx = 3*jid-2;
+    idy = 3*jid-1;
+    idz = 3*jid;
 
     % add unit vector into Amat
-    Amat([idx idy],numbars+i)=reacvecs(i,:);
+    Amat([idx idy idz],numbars+i)=reacvecs(i,:);
 end
 
 % build load vector
@@ -87,12 +89,12 @@ for i=1:numloads
     jid=loadjoints(i);
 
     % equation id numbers
-    idx = 2*jid-1;
-    idy = 2*jid;
-    idz = 2*jid+1;
+    idx = 3*jid-2;
+    idy = 3*jid-1;
+    idz =3*jid;
 
     % add unit vector into bvec (sign change)
-    bvec([idx idy])=-loadvecs(i,:);
+    bvec([idx idy idz])=-loadvecs(i,:);
 end
 
 % check for invertability of Amat
