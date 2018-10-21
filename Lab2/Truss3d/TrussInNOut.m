@@ -2,7 +2,7 @@ clear;
 clc;
 close all;
 
-inputfile = 'mialast.txt';
+inputfile = 'ttw.inp';
 outputfile = 'OurTest.txt';
 AssumedFail = 1/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
@@ -27,6 +27,10 @@ reacvecs = Reactions_forces(:,2:c);
 [r c] = size(External_Loads);
 loadjoints = External_Loads(:,1);
 loadvecs = External_Loads(:,2:c);
+
+%% add weight
+
+[loadvecs_weightsAdded,loadjoints_weightsAdded]=addweight(connectivity,joints,loadjoints,loadvecs);
 
 %%
 [barforces,reacforces]=FA3D(joints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs);
