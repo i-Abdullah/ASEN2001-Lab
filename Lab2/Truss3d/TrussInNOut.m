@@ -2,12 +2,14 @@ clear;
 clc;
 close all;
 
-inputfile = 'ttw.inp';
+inputfile = 'test3d_1.txt';
 outputfile = 'OurTest.txt';
 AssumedFail = 1/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
-
+[r1 c1] = size(connectivity);
+sleve = zeros(1,r1);
 % -8.21 what you should get for test case 1
 %% Force Analysis
 
@@ -30,20 +32,20 @@ loadvecs = External_Loads(:,2:c);
 
 %% add weight
 
-[loadvecs_weightsAdded,loadjoints_weightsAdded]=addweight(connectivity,joints,loadjoints,loadvecs);
+[barweight_m,reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
 
 %%
-[barforces,reacforces]=FA3D(joints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs);
+[barforces,reacforces]=FA3D(joints,connectivity,reacjoints_w,reacvecs,loadjoints,barweight_m);
 
 %% Prepare writeoutput functions inputs
 
-writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs);
+writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints_w,reacvecs,loadjoints,barweight_m);
 
 %% 
 
 joints3D=zeros(size(joints,1),3);
 joints3D(:,1:3)=joints;
-plottruss(joints3D,connectivity,barforces,reacjoints,3*[0.025,0.04,0.05],[1 1 0 0]);
+plottruss(joints3D,connectivity,barforces,reacjoints_w,3*[0.025,0.04,0.05],[1 1 0 0]);
 
 
 %% Monted Carlo

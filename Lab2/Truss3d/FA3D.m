@@ -1,4 +1,4 @@
-function [barforces,reacforces]=forceanalysis(joints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs)
+function [barforces,reacforces]=forceanalysis(joints,connectivity,reacjoints_w,reacvecs,loadjoints,barweight_m)
 % function [barforces,reacforces]=forceanalysis(joints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs)
 %
 % compute forces in bars and reaction forces
@@ -18,7 +18,7 @@ function [barforces,reacforces]=forceanalysis(joints,connectivity,reacjoints,rea
 % extract number of joints, bars, reactions, and loads
 numjoints = size(joints,1);
 numbars   = size(connectivity,1);
-numreact  = size(reacjoints,1);
+numreact  = size(reacjoints_w,1);
 numloads  = size(loadjoints,1);
 
 % number of equations
@@ -71,7 +71,7 @@ end
 for i=1:numreact
     
     % get joint id at which reaction force acts
-    jid=reacjoints(i);
+    jid=reacjoints_w(i);
 
     % equation id numbers
     idx = 3*jid-2;
@@ -94,7 +94,7 @@ for i=1:numloads
     idz =3*jid;
 
     % add unit vector into bvec (sign change)
-    bvec([idx idy idz])=-loadvecs(i,:);
+    bvec([idx idy idz])=-barweight_m(i,:);
 end
 
 % check for invertability of Amat

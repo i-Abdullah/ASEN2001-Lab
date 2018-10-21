@@ -55,8 +55,7 @@ loadvecs = External_Loads(:,2:c);
 ext_x=max(joints(:,1))-min(joints(:,1));   % extension in x-direction
 ext_y=max(joints(:,2))-min(joints(:,2));   % extension in y-direction
 ext_z=max(joints(:,3))-min(joints(:,3));   % extension in z-direction
-ext = max([ext_x,ext_y,ext_z]);
-
+ 
 % loop overall samples
 numjoints=size(joints,1);       % number of joints
 maxforces=zeros(numsamples,1);  % maximum bar forces for all samples
