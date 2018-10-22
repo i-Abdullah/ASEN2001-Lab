@@ -42,12 +42,12 @@ function plottruss(xyz,topo,eforce,fbc,rads,pltflags)
 %                      1. component: 0/1 - plot node id numbers
 %                      2. component: 0/1 - plot bar id numbers
 %                      3. component: 0/1 - plot force value
+%                      4. component: 0/1 - 2D(0) or 3D(1) view 
 %
 %--------------------------------------------------------
 % Kurt Maute for ASEN 2001 Oct. 2006
 %   Revised Oct. 2007 by Sungeun Jeon
 %   Revised Sep. 2010 by Kurt Maute
-%   Revised Sep. 2012 by Kurt Maute
 %--------------------------------------------------------
 
 figure(1);
@@ -59,8 +59,8 @@ if nargin < 6; error('routine requires 6 input parameters'); end
 
 % extract
 
-[numnode dim]=size(xyz);
-[numelem dum]=size(topo);
+[numnode, dim]=size(xyz);
+numelem = size(topo,1);
 
 if dim ~= 3
    display('Error in plottruss: 3 coordinates are needed for array xyz');
@@ -131,7 +131,10 @@ for i=1:length(fbc)
     hold on;
 end
 
+% plot parameters
+
 axis('equal');
+title('Member forces');
 
 lightangle(-45,30)
 set(gcf,'Renderer','openGl')
@@ -140,7 +143,14 @@ set(findobj(gca,'type','surface'),...
     'AmbientStrength',.3,'DiffuseStrength',.8,...
     'SpecularStrength',.9,'SpecularExponent',25,...
     'BackFaceLighting','unlit')
-    
+
+if pltflags(4) 
+    % use default
+else
+    % set view point to 0,0,1
+    view([0 0 1]);    
+end
+
 return
 
 function [sx,sy,sz]=plotnode(xyz,rads)

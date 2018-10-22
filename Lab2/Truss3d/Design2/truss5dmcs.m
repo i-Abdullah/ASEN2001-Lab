@@ -32,7 +32,8 @@ numsamples = 1e5;   % number of samples
 ext_x=max(joints(:,1))-min(joints(:,1));   % extension in x-direction
 ext_y=max(joints(:,2))-min(joints(:,2));   % extension in y-direction
 ext_z=max(joints(:,3))-min(joints(:,3));   % extension in z-direction
-ext  =max([ext_x,ext_y,ext_z]);
+
+ext  =max([ext_x,ext_y ext_z]);
 
 % loop overall samples
 numjoints=size(joints,1);       % number of joints
@@ -48,7 +49,7 @@ for is=1:numsamples
     jstrength = jstrmean + varstrength;
     
     % generate random samples
-    varjoints = (jposcov*ext)*randn(numjoints,3);
+    varjoints = (jposcov*ext)*randn(numjoints,2);
     
     % perturb joint positions
     randjoints = joints + varjoints;
@@ -131,18 +132,18 @@ while line > 0
             numloads  = dims(4);
             
             % check for correct number of reaction forces
-            if numreact~=6; error('incorrect number of reaction forces');end
+            if numreact~=3; error('incorrect number of reaction forces');end
             
             % initialize arrays
-            joints       = zeros(numjoints,3);
+            joints       = zeros(numjoints,2);
             connectivity = zeros(numbars,2);
             reacjoints   = zeros(numreact,1);
-            reacvecs     = zeros(numreact,3);
+            reacvecs     = zeros(numreact,2);
             loadjoints   = zeros(numloads,1);
-            loadvecs     = zeros(numloads,3);
+            loadvecs     = zeros(numloads,2);
             
             % check whether system satisfies static determiancy condition
-            if 3*numjoints - 6 ~= numbars
+            if 2*numjoints - 3 ~= numbars
                 error('truss is not statically determinate');
             end
 
@@ -155,7 +156,7 @@ while line > 0
             counter = counter + 1;
             
             % read joint id and coordinates;
-            tmp=sscanf(line,'%d%e%e%e');
+            tmp=sscanf(line,'%d%e%e');
             
             % extract and check joint id
             jointid=tmp(1);
@@ -164,7 +165,7 @@ while line > 0
             end
             
             % store coordinates of joints
-            joints(jointid,:)=tmp(2:4);
+            joints(jointid,:)=tmp(2:3);
             
             % expect next input block to be connectivity
             if counter==numjoints
@@ -206,7 +207,7 @@ while line > 0
             counter = counter + 1;
             
             % read joint id and unit vector of reaction force;
-            tmp=sscanf(line,'%d%e%e%e');
+            tmp=sscanf(line,'%d%e%e');
             
             % extract and check joint id
             jointid=tmp(1);
@@ -215,7 +216,7 @@ while line > 0
             end
             
             % extract untit vector and check length
-            uvec=tmp(2:4);
+            uvec=tmp(2:3);
             uvec=uvec/norm(uvec);
             
             % store joint id and unit vector
@@ -234,7 +235,7 @@ while line > 0
             counter = counter + 1;
             
             % read joint id and unit vector of reaction force;
-            tmp=sscanf(line,'%d%e%e%e');
+            tmp=sscanf(line,'%d%e%e');
             
             % extract and check joint id
             jointid=tmp(1);
@@ -243,7 +244,7 @@ while line > 0
             end
             
             % extract force vector
-            frcvec=tmp(2:4);
+            frcvec=tmp(2:3);
             
             % store joint id and unit vector
             loadjoints(counter) = jointid;
@@ -292,7 +293,7 @@ numreact  = size(reacjoints,1);
 numloads  = size(loadjoints,1);
 
 % number of equations
-numeqns = 3 * numjoints;
+numeqns = 2 * numjoints;
 
 % allocate arrays for linear system
 Amat = zeros(numeqns);
@@ -303,9 +304,9 @@ bvec = zeros(numeqns,1);
 for i=1:numjoints
     
    % equation id numbers
-   idx = (3*i)-2;
-   idy = (3*i)-1;
-   idz = (3*i);
+   idx = 2*i-1;
+   idy = 2*i;
+   
    % get all bars connected to joint
    [ibar,ijt]=find(connectivity==i);
    
@@ -329,7 +330,7 @@ for i=1:numjoints
        uvec   = vec_ij/norm(vec_ij);
        
        % add unit vector into Amat
-       Amat([idx idy idz],barid)=uvec; 
+       Amat([idx idy],barid)=uvec;
    end
 end
 
@@ -340,12 +341,11 @@ for i=1:numreact
     jid=reacjoints(i);
 
     % equation id numbers
-    idx = (3*jid)-2;
-    idy = (3*jid)-1;
-    idz = (3*jid);
+    idx = 2*jid-1;
+    idy = 2*jid;
 
     % add unit vector into Amat
-    Amat([idx idy idz],numbars+i)=reacvecs(i,:);
+    Amat([idx idy],numbars+i)=reacvecs(i,:);
 end
 
 % build load vector
@@ -355,12 +355,11 @@ for i=1:numloads
     jid=loadjoints(i);
 
     % equation id numbers
-    idx = (3*jid)-2;
-    idy = (3*jid)-1;
-    idz = (3*jid);
+    idx = 2*jid-1;
+    idy = 2*jid;
 
     % add unit vector into bvec (sign change)
-    bvec([idx idy idz])=-loadvecs(i,:);
+    bvec([idx idy])=-loadvecs(i,:);
 end
 
 % check for invertability of Amat

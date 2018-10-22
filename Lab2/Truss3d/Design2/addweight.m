@@ -7,7 +7,7 @@ barlength = zeros(r,1);
 for i = 1:r
     joint_2 = connectivity(i,2);
     joint_1 = connectivity(i,1);
-    barlength(i) = sqrt(((joints(joint_1,1)-joints(joint_2,1))^2)+((joints(joint_1,2)-joints(joint_2,2))^2)+((joints(joint_1,3)-joints(joint_2,3))^2));
+    barlength(i) = sqrt(((joints(joint_1,1)-joints(joint_2,1))^2)+((joints(joint_1,2)-joints(joint_2,2))^2)+((joints(joint_1,3)-joints(joint_2,3))^2))*(0.0254);
 end
 % barweight given bar dens and length
 barweight = barlength.*(lin_dens*9.81);
