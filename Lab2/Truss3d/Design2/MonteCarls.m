@@ -1,4 +1,4 @@
-function [ probfail ] = truss3dmcs(inputfile)
+function [probfail] = MonteCarls(inputfile)
 %
 % Stochastic analysis of 2-D statically determinate truss by
 % Monte Carlo Simulation. Only positions and strength of joints 
@@ -25,16 +25,15 @@ jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
 numsamples = 1e5;   % number of samples
 
+
+
 % read input file
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
 
-LinDensity = 31.13 / 1000 ; % kg / m
-sleveweight = (5.35/1000)*9.81;
 
 [r1 c1] = size(connectivity);
 sleve = zeros(1,r1);
-sleve(9) = 1;
-sleve(10) = 1;
+sleveweight = (5.35/1000)*9.81;
 
 %Prepare inputs:
 [ r c ] = size(cord_joints);
@@ -79,9 +78,8 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-[barweight_m,reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
-
-[barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
+    [barweight_m,reacjoints_w]=addweight(connectivity,randjoints,loadjoints,loadvecs,sleve,sleveweight);
+[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
     
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
@@ -91,7 +89,7 @@ for is=1:numsamples
     failure(is) = maxforces(is) > jstrength || maxreact(is) > jstrength;
 end
 
-figure(2);
+figure(1);
 subplot(1,2,1);
 histogram(maxforces,30);
 title('Histogram of maximum bar forces');
@@ -107,5 +105,5 @@ ylabel('Frequency');
 fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
 
 probfail = sum(failure)/numsamples;
-
 end
+

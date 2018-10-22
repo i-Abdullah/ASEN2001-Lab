@@ -5,7 +5,7 @@ close all;
 inputfile = 'Design1.inp';
 outputfile = 'Design1Output.txt';
 AssumedFail = 10/100 ;
-LinDensity = 31.13 / 1000 ; % kg / m
+LinDensity = 50.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
@@ -62,7 +62,7 @@ jposcov    = 0.01;  % coefficient of variation of joint position percent of leng
 numsamples = 1e5;   % number of samples
 
 
-ProbFaliure = MontePy(inputfile);
+ProbFaliure = pleasework(inputfile);
 
 Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 
