@@ -21,7 +21,7 @@ function writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivi
 fid=fopen(outputfile,'w');
 
 % write header
-fprintf(fid,'3-D Truss analysis\n');
+fprintf(fid,'2-D Truss analysis\n');
 fprintf(fid,'------------------\n\n');
 fprintf(fid,'Date: %s\n\n',datestr(now));
 
@@ -29,16 +29,16 @@ fprintf(fid,'Date: %s\n\n',datestr(now));
 fprintf(fid,'Input file: %s\n\n',inputfile);
 
 % write coordinates of joints
-fprintf(fid,'Joints:         Joint-id  x-coordinate y-coordinate z-coordinate\n');
+fprintf(fid,'Joints:         Joint-id  x-coordinate y-coordinate\n');
 for i=1:size(joints,1)
-    fprintf(fid,'%17d %12.2f %12.2f %12.2f\n',i,joints(i,1),joints(i,2),joints(i,3));
+    fprintf(fid,'%17d %12.2f %12.2f\n',i,joints(i,1),joints(i,2));
 end
 fprintf(fid,'\n\n');
 
 % write external loads
-fprintf(fid,'External loads: Joint-id  Force-x      Force-y      Force-z\n');
+fprintf(fid,'External loads: Joint-id  Force-x      Force-y\n');
 for i=1:size(loadjoints,1)
-    fprintf(fid,'%17d %12.2f %12.2f %12.2f\n',loadjoints(i),loadvecs(i,1),loadvecs(i,2),loadvecs(i,3));
+    fprintf(fid,'%17d %12.2f %12.2f\n',loadjoints(i),loadvecs(i,1),loadvecs(i,2));
 end
 fprintf(fid,'\n');
     
@@ -52,9 +52,9 @@ end
 fprintf(fid,'\n');
 
 % write connectivity and forces
-fprintf(fid,'Reactions:      Joint-id  Uvec-x       Uvec-y      Uvec-z     Force\n');
+fprintf(fid,'Reactions:      Joint-id  Uvec-x       Uvec-y      Force\n');
 for i=1:size(reacjoints,1)
-    fprintf(fid,'%17d %12.2f %12.2f %12.2f %12.3f\n',reacjoints(i),reacvecs(i,1),reacvecs(i,2),reacvecs(i,3),reacforces(i));
+    fprintf(fid,'%17d %12.2f %12.2f %12.3f\n',reacjoints(i),reacvecs(i,1),reacvecs(i,2),reacforces(i));
 end
 
 % close output file

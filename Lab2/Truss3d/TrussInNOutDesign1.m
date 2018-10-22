@@ -2,15 +2,19 @@ clear;
 clc;
 close all;
 
-inputfile = 'test3d_1.txt';
-outputfile = 'OurTest.txt';
-AssumedFail = 1/100 ;
+inputfile = 'ryantruss.inp';
+outputfile = 'OurTes1t.txt';
+AssumedFail = 10/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
+
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
+
 [r1 c1] = size(connectivity);
 sleve = zeros(1,r1);
-% -8.21 what you should get for test case 1
+sleve(17) = 1;
+sleve(18) = 1;
+
 %% Force Analysis
 
 %Prepare inputs:
@@ -35,11 +39,11 @@ loadvecs = External_Loads(:,2:c);
 [barweight_m,reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
 
 %%
-[barforces,reacforces]=FA3D(joints,connectivity,reacjoints_w,reacvecs,loadjoints,barweight_m);
+[barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m)
 
 %% Prepare writeoutput functions inputs
 
-writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints_w,reacvecs,loadjoints,barweight_m);
+writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m)
 
 %% 
 
@@ -49,6 +53,7 @@ plottruss(joints3D,connectivity,barforces,reacjoints_w,3*[0.025,0.04,0.05],[1 1 
 
 
 %% Monted Carlo
+
 
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
@@ -64,5 +69,3 @@ Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 % 
 Saf = 4.8 / Fdsr ;
 
-
-%}

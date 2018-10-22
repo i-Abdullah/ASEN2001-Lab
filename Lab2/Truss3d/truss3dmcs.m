@@ -23,17 +23,26 @@ function [probFail] = truss3dmcs(inputfile)
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
-numsamples = 1e5;   % number of samples
+numsamples = 1e1;   % number of samples
 
 % read input file
 
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
 
+[numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
+
+[r1 c1] = size(connectivity);
+sleve = zeros(1,r1);
+sleve(17) = 1;
+sleve(18) = 1;
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
 
 %Prepare inputs:
 
-joints = cord_joints(:,2:length(cord_joints));
+[ r c ] = size(cord_joints);
+joints = cord_joints(:,(2:end));
 
 [r c] = size(connectivity);
 connectivity = connectivity(:,2:c);
@@ -48,14 +57,13 @@ reacvecs = Reactions_forces(:,2:c);
 loadjoints = External_Loads(:,1);
 loadvecs = External_Loads(:,2:c);
 
-
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 % determine extension of truss
 ext_x=max(joints(:,1))-min(joints(:,1));   % extension in x-direction
 ext_y=max(joints(:,2))-min(joints(:,2));   % extension in y-direction
 ext_z=max(joints(:,3))-min(joints(:,3));   % extension in z-direction
- 
+ext=max([ext_x,ext_y,ext_z]);
 % loop overall samples
 numjoints=size(joints,1);       % number of joints
 maxforces=zeros(numsamples,1);  % maximum bar forces for all samples
@@ -76,7 +84,10 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-[barforces,reacforces]=FA3D(randjoints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs);
+
+[barweight_m,reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
+[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
+
     
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
