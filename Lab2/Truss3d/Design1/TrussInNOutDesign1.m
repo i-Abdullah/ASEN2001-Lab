@@ -4,8 +4,8 @@ close all;
 
 inputfile = 'Design1.inp';
 outputfile = 'Design1Output.txt';
-AssumedFail = 10/100 ;
-LinDensity = 50.13 / 1000 ; % kg / m
+AssumedFail = 50/100 ;
+LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
@@ -55,18 +55,18 @@ plottruss(joints3D,connectivity,barforces,reacjoints_w,3*[0.025,0.04,0.05],[1 1 
 %% Monted Carlo
 
 
-
-jstrmean   = 4.8;   % mean of joint strength 4.8 N
+jstrmean   = 4;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
 numsamples = 1e5;   % number of samples
 
 
-ProbFaliure = pleasework(inputfile);
+ProbFaliure = MonteCarls(inputfile);
 
 Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 
 % any given time your max tensile/compressive strength shouldn't exceed the
 % 
-Saf = 4.8 / Fdsr ;
+Saf = 4 / Fdsr ;
+
 

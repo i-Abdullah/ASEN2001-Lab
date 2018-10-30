@@ -52,18 +52,20 @@ plottruss(joints3D,connectivity,barforces,reacjoints_w,3*[0.025,0.04,0.05],[1 1 
 
 %% Monted Carlo
 
-%
+%{
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
 numsamples = 1e5;   % number of samples
 
 
-ProbFaliure = MontePy(inputfile);
+ProbFaliure = MonteCarls(inputfile);
 
 Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 
 % any given time your max tensile/compressive strength shouldn't exceed the
 % 
 Saf = 4.8 / Fdsr ;
+
+%}
 

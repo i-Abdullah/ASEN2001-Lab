@@ -102,7 +102,7 @@ title('Histogram of maximum support reactions');
 xlabel('Magnitude of reaction forces');
 ylabel('Frequency');
 
-fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
+%fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
 
 probfail = sum(failure)/numsamples;
 end

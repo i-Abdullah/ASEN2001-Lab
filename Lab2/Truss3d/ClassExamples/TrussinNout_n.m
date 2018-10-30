@@ -2,7 +2,7 @@ clear;
 clc;
 close all;
 
-inputfile = 'test3d_1.inp';
+inputfile = 'test3d_2.inp';
 outputfile = 'test3d_1_out.txt';
 AssumedFail = 1/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
@@ -50,7 +50,7 @@ plottruss(joints3D,connectivity,barforces,reacjoints,3*[0.025,0.04,0.05],[1 1 0 
 
 
 %% Monted Carlo
-
+%{
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)

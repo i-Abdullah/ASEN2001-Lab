@@ -1,4 +1,4 @@
-function truss3dmcs(inputfile)
+function [ProbFaliure] = truss3dmcs(inputfile)
 %
 % Stochastic analysis of 2-D statically determinate truss by
 % Monte Carlo Simulation. Only positions and strength of joints 
@@ -54,7 +54,16 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    [barforces,reacforces] = forceanalysis(randjoints,connectivity,reacjoints,reacvecs,loadjoints,loadvecs);
+    LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
+
+    [r1 c1] = size(connectivity);
+   
+    sleve = zeros(1,r1);
+sleve(9) = 1;
+sleve(10) = 1;
+    [barweight_m,reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
+    [barforces,reacforces] = forceanalysis(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
     
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
@@ -78,6 +87,9 @@ xlabel('Magnitude of reaction forces');
 ylabel('Frequency');
 
 fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
+
+
+ProbFaliure = sum(failure)/numsamples;
 
 end
 

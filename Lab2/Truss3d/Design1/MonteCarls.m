@@ -20,7 +20,7 @@ function [probfail] = MonteCarls(inputfile)
 % Author: Kurt Maute for ASEN 2001, Oct 13 2012
 
 % parameters
-jstrmean   = 4.8;   % mean of joint strength 4.8 N
+jstrmean   = 1;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
 numsamples = 1e5;   % number of samples
@@ -55,6 +55,8 @@ reacvecs = Reactions_forces(:,2:c);
 loadjoints = External_Loads(:,1);
 loadvecs = External_Loads(:,2:c);
 
+[loadvecs_weight,loadjoints_weight]=addweight(connectivity,joints,loadjoints,loadvecs,sleve,sleveweight);
+
 % determine extension of truss
 ext_x=max(joints(:,1))-min(joints(:,1));   % extension in x-direction
 ext_y=max(joints(:,2))-min(joints(:,2));% extension in y-direction
@@ -81,9 +83,8 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    [barweight_m,reacjoints_w]=addweight(connectivity,randjoints,loadjoints,loadvecs,sleve,sleveweight);
-[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
-    
+[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,loadjoints_weight,loadvecs_weight);
+
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
     maxreact(is)  = max(abs(reacforces));
@@ -92,7 +93,7 @@ for is=1:numsamples
     failure(is) = maxforces(is) > jstrength || maxreact(is) > jstrength;
 end
 
-figure(1);
+figure(2);
 subplot(1,2,1);
 histogram(maxforces,30);
 title('Histogram of maximum bar forces');

@@ -12,7 +12,7 @@ for i = 1:r
 end
 % barweight given bar dens and length
 barweight = barlength.*(lin_dens*9.81);
-barweight_m = zeros(r,3);
+barweight_m = zeros(r1,3);
 
 for j = 1:length(loadjoints)
     
@@ -22,7 +22,7 @@ end
 
 %add half of the bar weight into each side
 
-for k = 1:r
+for k = 1:r1
     
 barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2;
 barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2;
@@ -32,7 +32,7 @@ end
 
 % after hardcoding sleves with 1 and 0, if there is a sleve add the weight
 % to the bar
-for i = 1:r
+for i = 1:r1
     if sleve(i) == 1
        barweight_m(connectivity(i,1),3) = barweight_m(connectivity(i,1),3) - sleveweight/2;
        barweight_m(connectivity(i,2),3) = barweight_m(connectivity(i,2),3) - sleveweight/2;

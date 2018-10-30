@@ -1,7 +1,7 @@
 # Truss Input File
 #
 # Number of joints, bar, reactions, and external loads
-16  42  6  1
+16  42  6  16
 #
 # Magnet joints and their coordinates
 001     0.000     0.000     0.000
