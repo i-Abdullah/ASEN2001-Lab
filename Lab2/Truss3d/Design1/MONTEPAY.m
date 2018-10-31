@@ -1,4 +1,4 @@
-function [probfail] = MonteCarls(inputfile)
+function [ probFail ] = truss3dmcs(inputfile)
 %
 % Stochastic analysis of 2-D statically determinate truss by
 % Monte Carlo Simulation. Only positions and strength of joints 
@@ -20,20 +20,14 @@ function [probfail] = MonteCarls(inputfile)
 % Author: Kurt Maute for ASEN 2001, Oct 13 2012
 
 % parameters
-jstrmean   = 4.8;   % mean of joint strength 4.8 N
+jstrmean   = 0.5;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
 numsamples = 1e5;   % number of samples
 
-
-
-% read input file
+%% read input file
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
 
-
-[r1 c1] = size(connectivity);
-sleve = zeros(1,r1);
-sleveweight = (5.35/1000)*9.81;
 
 %Prepare inputs:
 [ r c ] = size(cord_joints);
@@ -52,7 +46,7 @@ reacvecs = Reactions_forces(:,2:c);
 loadjoints = External_Loads(:,1);
 loadvecs = External_Loads(:,2:c);
 
-% determine extension of truss
+%% determine extension of truss
 ext_x=max(joints(:,1))-min(joints(:,1));   % extension in x-direction
 ext_y=max(joints(:,2))-min(joints(:,2));% extension in y-direction
 ext_z=max(joints(:,3))-min(joints(:,3)); %extension in z-direction
@@ -78,8 +72,16 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    [barweight_m,reacjoints_w]=addweight(connectivity,randjoints,loadjoints,loadvecs,sleve,sleveweight);
-[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
+    
+LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
+magnetsmass = 1.7;
+[r1 c1] = size(connectivity);
+sleve = zeros(1,r1);
+
+
+[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,sleveweight,magnetsmass);
+[barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
     
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
@@ -89,7 +91,7 @@ for is=1:numsamples
     failure(is) = maxforces(is) > jstrength || maxreact(is) > jstrength;
 end
 
-figure(2);
+figure(1);
 subplot(1,2,1);
 histogram(maxforces,30);
 title('Histogram of maximum bar forces');
@@ -102,8 +104,10 @@ title('Histogram of maximum support reactions');
 xlabel('Magnitude of reaction forces');
 ylabel('Frequency');
 
-%fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
+fprintf('\nFailure probability : %e \n\n',sum(failure)/numsamples);
 
-probfail = sum(failure)/numsamples;
+
+probFail = sum(failure)/numsamples;
 end
+
 

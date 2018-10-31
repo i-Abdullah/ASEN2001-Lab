@@ -23,7 +23,7 @@ function [probfail] = MonteCarls(inputfile)
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
-numsamples = 1e5;   % number of samples
+numsamples = 1e3;   % number of samples
 
 
 
@@ -58,6 +58,20 @@ ext_y=max(joints(:,2))-min(joints(:,2));% extension in y-direction
 ext_z=max(joints(:,3))-min(joints(:,3)); %extension in z-direction
 ext  =max([ext_x,ext_y,ext_z]);
 
+
+%% add weight :
+
+LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
+magnetsmass = 1.7;
+[r1 c1] = size(connectivity);
+sleve = zeros(1,r1);
+
+
+[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,sleveweight,magnetsmass);
+
+%%
+
 % loop overall samples
 numjoints=size(joints,1);       % number of joints
 maxforces=zeros(numsamples,1);  % maximum bar forces for all samples
@@ -65,7 +79,6 @@ maxreact=zeros(numsamples,1);   % maximum support reactions for all samples
 failure=zeros(numsamples,1);    % failure of truss
 
 for is=1:numsamples 
-    
     % generate random joint strength limit
     varstrength = (jstrcov*jstrmean)*randn(1,1);
     
@@ -78,11 +91,11 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    [barweight_m,reacjoints_w]=addweight(connectivity,randjoints,loadjoints,loadvecs,sleve,sleveweight);
-[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
+
+    [barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
     
     % determine maximum force magnitude in bars and supports
-    maxforces(is) = max(abs(barforces));
+    maxforces(is) = max(abs(barforces))
     maxreact(is)  = max(abs(reacforces));
     
     % determine whether truss failed

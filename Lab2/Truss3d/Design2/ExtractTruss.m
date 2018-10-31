@@ -1,10 +1,16 @@
 
 function [num,magnets,rods_and_connections,Reactions_forces,External_Loads] = ExtractTruss(Input)
-% Sept 17th, 2018. ASEN 2001 Statics and Structures, Lab 1
-% Done By: Abdulla Al Ameri, Daniel Gutierrez Mendoza, Davis Peirce
+% Oct 1th, 2018. ASEN 2001 Statics and Structures, Lab 2
+% Done By:
+%           - Abdulla Al Ameri
+%           - Eric Hunnel
+%           - Kunal Sinha
+%           - Johann Kailey-Steiner
+%           - Mia Abouhamad
 %----------------------------------------------------------------------
 % This codes extracts information
-% about a body, forces, and moments acting on a body from a file.
+% from a given txt file. The text file is commented by # symbols and the
+% code will go and get everything in between, designed for Lab 2.
 % ----------------------------------------------------------------------
 % INPUTS:
 %           - .txt file name
@@ -13,28 +19,23 @@ function [num,magnets,rods_and_connections,Reactions_forces,External_Loads] = Ex
 %----------------------------------------------------------------------
 % OUTPUTS: In order of output (total of 8)
 %
-%           - number of external forces and moments (in array respectively)
+%           - num: Number of joints, bar, reactions, and external loads  (in array respectively)
 %
-%           - coordinates of the points at which external forces are
-%           applied (x y z)
+%           - magnets: Magnet joints and their coordinates (Norm x y z)
 %
-%           - magnitude and direction of external forces ( F dx dy dz )
+%           - rods_and_connections : Rigid rods and their associated joints
 %           
 %           - location at which external couple moments are applied ( x y
 %           z )
 %
-%           - magnitude and direction of external couple moments (M   ux
-%           uy   uz)
+%           - Reactions_forces (Joint location   fx  fy   fz)
 %
-%           - location of supports ( x y z )
+%           - External loads (Joint location   fx  fy   fz)
 %
-%           - type (F/M) of reactions
-%
-%           -  direction of reactions
 %----------------------------------------------------------------------
 % If you are not fimilar with CLI ( Command Line interface ) function in
 % matlab, you would've to do something like
-% [a,b,c,d,e,f,g,h] = Extraction ('Lab1_Input');
+% [a,b,c,d,e,f,g,h] = Extraction ('Lab2_Input.txt');
 % where a,b,c ... are your outputs in order
 
 %% Housekeeping

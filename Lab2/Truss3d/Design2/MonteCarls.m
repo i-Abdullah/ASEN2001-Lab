@@ -89,7 +89,7 @@ for is=1:numsamples
     failure(is) = maxforces(is) > jstrength || maxreact(is) > jstrength;
 end
 
-figure(1);
+figure(2);
 subplot(1,2,1);
 histogram(maxforces,30);
 title('Histogram of maximum bar forces');
