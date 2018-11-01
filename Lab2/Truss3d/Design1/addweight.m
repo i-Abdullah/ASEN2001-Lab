@@ -46,8 +46,10 @@ barlength = zeros(r,1);
 %loop over conectivity to find length.
 
 for i = 1:r
+    %see each joints each bar is connected to.
     joint_2 = connectivity(i,2);
     joint_1 = connectivity(i,1);
+    %get length and convert to meters
     barlength(i) = sqrt(((joints(joint_1,1)-joints(joint_2,1))^2)+((joints(joint_1,2)-joints(joint_2,2))^2)+((joints(joint_1,3)-joints(joint_2,3))^2))*(0.0254);
 end
 
@@ -55,6 +57,8 @@ end
 % barweight given bar dens and length
 barweight = barlength.*(lin_dens*9.81);
 barweight_m = zeros(r1,3);
+
+% add pre-exisiting loads if there's any
 
 for j = 1:length(loadjoints)
     
@@ -64,7 +68,7 @@ end
 
 %add half of the bar weight into each side
 
-for k = 1:r1
+for k = 1:r
     
 barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2;
 barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2;
@@ -78,8 +82,8 @@ end
 % the sleve vector is coded 
 for i = 1:length(sleve)
     if sleve(i) == 1
-       barweight_m(connectivity(i,1),3) = barweight_m(connectivity(i,1),3) - sleveweight/2;
-       barweight_m(connectivity(i,2),3) = barweight_m(connectivity(i,2),3) - sleveweight/2;
+       barweight_m(connectivity(i,1),3) = barweight_m(connectivity(i,1),3) - (sleveweight/2);
+       barweight_m(connectivity(i,2),3) = barweight_m(connectivity(i,2),3) - (sleveweight/2);
     end
 end
 
@@ -87,6 +91,8 @@ end
 magweight = (magnetsmass/1000)*9.81;
 barweight_m(:,3) = barweight_m(:,3) - magweight;
 
+%restablish load joints, where each row will represent the number of joint
+%or joint id
 reacjoints_w = 1:r1;
 reacjoints_w = reacjoints_w';
 
@@ -95,6 +101,3 @@ reacjoints_w = reacjoints_w';
 
 
 end
-    
-
-    
