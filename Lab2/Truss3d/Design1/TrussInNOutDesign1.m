@@ -61,7 +61,7 @@ jposcov    = 0.01;  % coefficient of variation of joint position percent of leng
 numsamples = 1e5;   % number of samples
 
 
-ProbFaliure = MonteCarls(inputfile);
+ProbFaliure = MC2FINAL(inputfile);
 
 Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 

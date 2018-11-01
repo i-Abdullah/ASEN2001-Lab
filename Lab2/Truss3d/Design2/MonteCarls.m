@@ -78,8 +78,12 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    [barweight_m,reacjoints_w]=addweight(connectivity,randjoints,loadjoints,loadvecs,sleve,sleveweight);
-[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,reacjoints_w,barweight_m);
+    LinDensity = 31.13 / 1000 ; % kg / m
+sleveweight = (5.35/1000)*9.81;
+magnetsmass = 1.7;
+
+[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,sleveweight,magnetsmass);
+[barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
     
     % determine maximum force magnitude in bars and supports
     maxforces(is) = max(abs(barforces));
@@ -106,4 +110,3 @@ ylabel('Frequency');
 
 probfail = sum(failure)/numsamples;
 end
-

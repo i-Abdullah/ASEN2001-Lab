@@ -95,7 +95,7 @@ for is=1:numsamples
     [barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
     
     % determine maximum force magnitude in bars and supports
-    maxforces(is) = max(abs(barforces))
+    maxforces(is) = max(abs(barforces));
     maxreact(is)  = max(abs(reacforces));
     
     % determine whether truss failed
