@@ -4,7 +4,7 @@ close all;
 
 inputfile = 'Design1.inp';
 outputfile = 'Design1Out.txt';
-AssumedFail = 0.028/100 ;
+AssumedFail = 0.005/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 magnetsmass = 1.7;
@@ -63,7 +63,7 @@ numsamples = 1e5;   % number of samples
 
 ProbFaliure = MonteCarls(inputfile);
 
-Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
+Fdsr = icdf('normal',0.51,jstrmean,0.08);
 
 % any given time your max tensile/compressive strength shouldn't exceed the
 % 
