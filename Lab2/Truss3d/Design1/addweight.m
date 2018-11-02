@@ -21,6 +21,7 @@ function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,lo
 %           we have and if at the location of the bar 1 is returned that
 %           mean there's a sleve there
 %           - sleveweight: in N.
+%           - magnetsmass: the mass of the balls that acted as joints
 %      
 %----------------------------------------------------------------------
 % OUTPUTS: In order of output (total of 8)
@@ -70,8 +71,8 @@ end
 
 for k = 1:r
     
-barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2;
-barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2;
+barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2 ;
+barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2 ;
 
     
 end
@@ -87,9 +88,15 @@ for i = 1:length(sleve)
     end
 end
 
-% add weight of magnets
+% add weight of magnet balls that are acting as joints
+
+%add the weight of the small magnets that are used to connect two magnet
+%balls together, they are one at the end of each bar, thus it'll be added
+%twice to each joint. This turns out to be 0.016677 N ( each small magnets
+%has a mass of 0.0017 kg, and they'll be constant thus they're hard coded.
+
 magweight = (magnetsmass/1000)*9.81;
-barweight_m(:,3) = barweight_m(:,3) - magweight;
+barweight_m(:,3) = barweight_m(:,3) - magweight - (0.016677*2) ;
 
 %restablish load joints, where each row will represent the number of joint
 %or joint id
