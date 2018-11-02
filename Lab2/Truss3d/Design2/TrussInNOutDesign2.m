@@ -4,7 +4,7 @@ close all;
 
 inputfile = 'Design2.inp';
 outputfile = 'Design2Out.txt';
-AssumedFail = 10/100 ;
+AssumedFail = 1.5e-4 ;
 LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 magnetsmass = 1.7;
@@ -45,7 +45,8 @@ loadvecs = External_Loads(:,2:c);
 
 writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
 
-%% 
+%% plot 3D Truss
+
 joints3D=zeros(size(joints,1),3);
 joints3D(:,1:3)=joints;
 plottruss(joints3D,connectivity,barforces,loadjoints_weighted,3*[0.025,0.04,0.05],[1 1 0 0]);
@@ -67,3 +68,7 @@ Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 % any given time your max tensile/compressive strength shouldn't exceed the
 % 
 Saf = 4.8 / Fdsr ;
+
+%save the montecarlo result
+saveas(gcf,['MonteCarlo.png'])
+

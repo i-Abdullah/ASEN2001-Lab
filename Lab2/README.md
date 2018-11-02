@@ -5,4 +5,4 @@
 
 * **Assignment information:** The assignment details and goals.
 
-* **TA's Files/GUI** .m and .mlapp files that are used and provided by the TA's to make the analysis simpler a bit.
+* **Truss3d:** The actual designs, with 2 designs and 2 test cases, additional information is provided inside.

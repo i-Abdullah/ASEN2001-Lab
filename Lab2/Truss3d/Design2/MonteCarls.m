@@ -1,6 +1,6 @@
 function [probfail] = MonteCarls(inputfile)
 %
-% Stochastic analysis of 2-D statically determinate truss by
+% Stochastic analysis of 3-D statically determinate truss by
 % Monte Carlo Simulation. Only positions and strength of joints 
 % treated as random variables
 %

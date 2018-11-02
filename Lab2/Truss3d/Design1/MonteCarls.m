@@ -1,6 +1,6 @@
 function [probfail] = MonteCarls(inputfile)
 %
-% Stochastic analysis of 2-D statically determinate truss by
+% Stochastic analysis of 3-D statically determinate truss by
 % Monte Carlo Simulation. Only positions and strength of joints 
 % treated as random variables
 %
@@ -23,7 +23,7 @@ function [probfail] = MonteCarls(inputfile)
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
-numsamples = 1e5;   % number of samples
+numsamples = 1.0e5;   % number of samples
 
 
 

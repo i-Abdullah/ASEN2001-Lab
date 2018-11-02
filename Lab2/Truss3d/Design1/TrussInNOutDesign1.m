@@ -4,7 +4,7 @@ close all;
 
 inputfile = 'Design1.inp';
 outputfile = 'Design1Out.txt';
-AssumedFail = 10/100 ;
+AssumedFail = 0.028/100 ;
 LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 magnetsmass = 1.7;
@@ -45,7 +45,7 @@ loadvecs = External_Loads(:,2:c);
 
 writeoutput(outputfile,inputfile,barforces,reacforces,joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
 
-%% 
+%% plot 3D Truss
 
 joints3D=zeros(size(joints,1),3);
 joints3D(:,1:3)=joints;
@@ -61,7 +61,7 @@ jposcov    = 0.01;  % coefficient of variation of joint position percent of leng
 numsamples = 1e5;   % number of samples
 
 
-ProbFaliure = MC2FINAL(inputfile);
+ProbFaliure = MonteCarls(inputfile);
 
 Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 
@@ -69,5 +69,6 @@ Fdsr = icdf('normal',AssumedFail,jstrmean,jstrcov);
 % 
 Saf = 4.8 / Fdsr ;
 
-
+%save the montecarlo result
+saveas(gcf,['MonteCarlo.png'])
 
