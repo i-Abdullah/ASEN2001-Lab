@@ -2,7 +2,7 @@ function plottruss(xyz,topo,eforce,fbc,rads,pltflags)
 %function plottruss(xyz,topo,eforce,fbc,rads,pltflags)
 %----------------------------------------------------
 %
-%  plot 3-truss, bars colored accoring to force
+%  plot 3D-truss, bars colored accoring to force
 %  supported nodes are plotted in red
 %  non-supported nodes are plotted in black
 %

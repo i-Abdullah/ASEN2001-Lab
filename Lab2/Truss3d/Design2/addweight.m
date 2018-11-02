@@ -8,7 +8,8 @@ function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,lo
 %           - Mia Abouhamad
 %----------------------------------------------------------------------
 % The following function will adjust given vectors of external loads and their
-% locations and return two vectors, one abou
+% locations and return two vectors, one about the location of the joints,
+% and one about their actual magnitude in x y z 
 %
 % ----------------------------------------------------------------------
 % INPUTS:
