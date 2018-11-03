@@ -1,7 +1,7 @@
 3-D Truss analysis
 ------------------
 
-Date: 03-Nov-2018 13:04:55
+Date: 03-Nov-2018 14:29:09
 
 Input file: Design1.inp
 
