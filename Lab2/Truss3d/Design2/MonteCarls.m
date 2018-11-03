@@ -23,7 +23,7 @@ function [probfail] = MonteCarls(inputfile)
 jstrmean   = 4.8;   % mean of joint strength 4.8 N
 jstrcov    = 0.08;  % coefficient of variation (sigma/u) of joint strength = 0.4/4.8 N
 jposcov    = 0.01;  % coefficient of variation of joint position percent of length of truss (ext)
-numsamples = 1e5;   % number of samples
+numsamples = 1.2e5;   % number of samples
 
 
 
