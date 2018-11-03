@@ -26,6 +26,11 @@
 
 `Design2out.txt:` Output text file that presents all the result of the static analysis.
 
+`Design2_100fail.inp:` Matlab input file that has the maximum external loads the truss can carry, i.e. the Monte Carlo will return faliure chance of 100%
+
+`Design2out.txt:` Output text file that has the maximum external loads the truss can carry, i.e. the Monte Carlo will return faliure chance of 100%.
+   
+
 ---
 
 > Aerospace Engineering Department, ASEN2001: Statics and structures, Fall 2018, Lab 2.
