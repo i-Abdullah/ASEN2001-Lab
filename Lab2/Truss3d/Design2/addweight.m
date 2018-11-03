@@ -1,4 +1,4 @@
-function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,lin_dens,sleve,sleveweight,magnetsmass)
+function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,loadvecs,lin_dens,sleve,slevemass,jointmass,magnetmass)
 % Oct 1th, 2018. ASEN 2001 Statics and Structures, Lab 2
 % Done By:
 %           - Abdulla Al Ameri
@@ -22,7 +22,9 @@ function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,lo
 %           we have and if at the location of the bar 1 is returned that
 %           mean there's a sleve there
 %           - sleveweight: in N.
-%           - magnetsmass: the mass of the balls that acted as joints
+%           - jointmass: the mass of the balls that acted as joints
+%           - magnetmass: mass of the magnets that were glued to the side
+%           of each bar.
 %      
 %----------------------------------------------------------------------
 % OUTPUTS: In order of output (total of 8)
@@ -44,6 +46,14 @@ function [barweight_m, reacjoints_w]=addweight(connectivity,joints,loadjoints,lo
 [r c]=size(connectivity);
 [r1 c1]=size(joints);
 barlength = zeros(r,1);
+
+% define weight of magnet balls that are acting as joints and weight of
+% magnets that are glued at the end of each bar
+
+magnetweight = (magnetmass)*9.81;
+jointweight = (jointmass)*9.81;
+sleveweight = (slevemass)*9.81;
+
 
 %loop over conectivity to find length.
 
@@ -68,12 +78,13 @@ for j = 1:length(loadjoints)
     
 end
 
-%add half of the bar weight into each side
+%add half of the bar weight into each side and with that half there's also
+%magnet that's glued at each side.
 
 for k = 1:r
     
-barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2 ;
-barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2 ;
+barweight_m(connectivity(k,1),3) = barweight_m(connectivity(k,1),3) - barweight(k)/2 - magnetweight ;
+barweight_m(connectivity(k,2),3) = barweight_m(connectivity(k,2),3) - barweight(k)/2 - magnetweight ;
 
     
 end
@@ -81,7 +92,8 @@ end
 % after hardcoding sleves with 1 and 0, if there is a sleve add the weight
 % to the bar
 
-% the sleve vector is coded 
+% the sleve vector is hard coded, check TrssInNOutDesign.m
+
 for i = 1:length(sleve)
     if sleve(i) == 1
        barweight_m(connectivity(i,1),3) = barweight_m(connectivity(i,1),3) - (sleveweight/2);
@@ -91,13 +103,7 @@ end
 
 % add weight of magnet balls that are acting as joints
 
-%add the weight of the small magnets that are used to connect two magnet
-%balls together, they are one at the end of each bar, thus it'll be added
-%twice to each joint. This turns out to be 0.016677 N ( each small magnets
-%has a mass of 0.0017 kg, and they'll be constant thus they're hard coded.
-
-magweight = (magnetsmass/1000)*9.81;
-barweight_m(:,3) = barweight_m(:,3) - magweight - (0.016677*2) ;
+barweight_m(:,3) = barweight_m(:,3) - jointweight ;
 
 %restablish load joints, where each row will represent the number of joint
 %or joint id

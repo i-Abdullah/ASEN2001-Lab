@@ -31,10 +31,6 @@ numsamples = 1e5;   % number of samples
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
 
 
-[r1 c1] = size(connectivity);
-sleve = zeros(1,r1);
-sleveweight = (5.35/1000)*9.81;
-
 %Prepare inputs:
 [ r c ] = size(cord_joints);
 joints = cord_joints(:,(2:end));
@@ -78,11 +74,18 @@ for is=1:numsamples
     randjoints = joints + varjoints;
     
     % compute forces in bars and reactions
-    LinDensity = 31.13 / 1000 ; % kg / m
-sleveweight = (5.35/1000)*9.81;
-magnetsmass = 1.7;
+LinDensity = 31.13 / 1000 ; % Bars linear density kg / m 
+slevemass = (5.35/1000); % mass in kg
+jointmass = 0.00845; % in kg
+magnetmass = 0.0017; % in kg.
 
-[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,sleveweight,magnetsmass);
+%location of sleves if there's any, go back and read TrussInNOutDesign.m if
+%you're confused about this
+[r1 c1] = size(connectivity);
+sleve = zeros(1,r1);
+
+
+[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,slevemass,jointmass,magnetmass);
 [barforces,reacforces]=FAA(randjoints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
     
     % determine maximum force magnitude in bars and supports

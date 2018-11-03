@@ -4,12 +4,18 @@ close all;
 
 inputfile = 'Design1.inp';
 outputfile = 'Design1Out.txt';
-AssumedFail = 1.5e-5 ;
-LinDensity = 31.13 / 1000 ; % kg / m
-sleveweight = (5.35/1000)*9.81;
-magnetsmass = 1.7;
+AssumedFail = 0.17 ;
+LinDensity = 31.13 / 1000 ; % Bars linear density kg / m 
+slevemass = (5.35/1000); % mass in kg
+jointmass = 0.00845; % in kg
+magnetmass = 0.0017; % in kg.
+
 [numbers,cord_joints,connectivity,Reactions_forces,External_Loads] = ExtractTruss(inputfile);
 
+
+% HARD CODE, PUT 1 where'ever you have a sleeve somewhere in connectivity
+% vector, all 0's means there's no sleves used any where, which is default.
+% 
 [r1 c1] = size(connectivity);
 sleve = zeros(1,r1);
 
@@ -36,7 +42,7 @@ loadvecs = External_Loads(:,2:c);
 
 %% add weight
 
-[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,sleveweight,magnetsmass);
+[loadvecs_weighted,loadjoints_weighted]=addweight(connectivity,joints,loadjoints,loadvecs,LinDensity,sleve,slevemass,jointmass,magnetmass);
 
 %%
 [barforces,reacforces]=FAA(joints,connectivity,reacjoints,reacvecs,loadjoints_weighted,loadvecs_weighted);
