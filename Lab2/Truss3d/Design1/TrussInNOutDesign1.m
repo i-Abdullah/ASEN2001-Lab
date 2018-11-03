@@ -4,7 +4,7 @@ close all;
 
 inputfile = 'Design1.inp';
 outputfile = 'Design1Out.txt';
-AssumedFail = 0.005/100 ;
+AssumedFail = 1.5e-5 ;
 LinDensity = 31.13 / 1000 ; % kg / m
 sleveweight = (5.35/1000)*9.81;
 magnetsmass = 1.7;
@@ -63,12 +63,20 @@ numsamples = 1e5;   % number of samples
 
 ProbFaliure = MonteCarls(inputfile);
 
-Fdsr = icdf('normal',0.51,jstrmean,0.08);
+Fdsr = icdf('normal',AssumedFail,jstrmean,0.4);
 
 % any given time your max tensile/compressive strength shouldn't exceed the
-% 
+% the max force in the bars
+
+% the safety factor.
+
 Saf = 4.8 / Fdsr ;
 
 %save the montecarlo result
 saveas(gcf,['MonteCarlo.png'])
 
+%% fprintf
+
+fprintf('Assumed probability failure: %2.5f\n',AssumedFail);
+fprintf('Monte-Carlo probability of failure: %2.5f\n',ProbFaliure);
+fprintf('Safety factor: %2.5f\n',Saf);
