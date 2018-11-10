@@ -1,4 +1,3 @@
-
 function [num,magnets,rods_and_connections,Reactions_forces,External_Loads] = ExtractTruss(Input)
 % Oct 1th, 2018. ASEN 2001 Statics and Structures, Lab 2
 % Done By:

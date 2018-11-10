@@ -2,8 +2,8 @@ clear;
 clc;
 close all;
 
-inputfile = 'Design2_100fail.inp';
-outputfile = 'Design2Out_100fail.txt';
+inputfile = 'Design2.inp';
+outputfile = 'Design2Out.txt';
 AssumedFail = 0.45 ;
 LinDensity = 31.13 / 1000 ; % Bars linear density kg / m 
 slevemass = (5.35/1000); % mass in kg

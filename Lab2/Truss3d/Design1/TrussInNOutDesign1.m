@@ -18,7 +18,7 @@ magnetmass = 0.0017; % in kg.
 % 
 [r1 c1] = size(connectivity);
 sleve = zeros(1,r1);
-
+sleve(35:42) = 1; %there's sleves from bar 35 until bar 42
 
 
 %% Force Analysis
