@@ -16,7 +16,7 @@ six_in_bar = 1.77 ; %N 6 inch bar
 twelve_in_bar = 2.94 ; %N 12 inch bar
 eighteen_in_bar = 3.92 ; %N 18 inch bar
 
-Thickness = 0.0206375; %in meter.
+LengthCS = 0.0206375; %in meter.
 %% read test data:
 
 [ TestData Comments ] = xlsread('TestData.xlsx');
@@ -41,7 +41,7 @@ bShear = (Barlength) - 2*ShearData(:,3); % in meter
 
 FoamLength = 3/4 * 0.0254 ; % in m
 BalsaLength = 1/32 * 0.0254 ; % in m
-Width = 4 * 0.0254; %in m
+WidthCS = 4 * 0.0254; %in m CS = Cross-section
 %% Shear/moment daiagram : TEST DATA
 
 % do the shear/moment daiagrams for shear fail
@@ -64,8 +64,8 @@ Max_Moment_BendFail = zeros(1,length(bBend));
 for i =1:length(bShear)
 syms x
 ShearDiagram_ShearFail{i} = piecewise ( 0<x<ShearData(i,3) , ShearData(i,2)/2 , ShearData(i,3)<x<bShear(i)+ShearData(i,3) , 0 , bShear(i)+ShearData(i,3)<x<Barlength , -ShearData(i,2)/2 );
-Max_Shear_ShearFail(i) = double(max(subs(cell2sym(ShearDiagram_ShearFail(i)),[0:0.01:Barlength]))) ;
-ShearStress_ShearFail(i) = ((3/2) * (Max_Shear_ShearFail(i)) )/ (Width*FoamLength) ;
+Max_Shear_ShearFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_ShearFail(i)),[0:0.01:Barlength])))) ;
+ShearStress_ShearFail(i) = ((3/2) * (Max_Shear_ShearFail(i)) )/ (WidthCS*FoamLength) ;
 
 end
 
@@ -76,8 +76,8 @@ ShearDiagram_BendFail = {};
 for i =1:length(bBend)
 syms x
 ShearDiagram_BendFail{i} = piecewise ( 0<x<BendData(i,3) , BendData(i,2)/2 , BendData(i,3)<x<bBend(i)+ BendData(i,3) , 0 , bBend(i)+BendData(i,3)<x<Barlength , -BendData(i,2)/2 );
-Max_Shear_BendFail(i) = double(max(subs(cell2sym(ShearDiagram_BendFail(i)),[0:0.01:Barlength]))) ;
-ShearStress_BendFail(i) = ((3/2) * (Max_Shear_BendFail(i)) )/ (Width*FoamLength) ;
+Max_Shear_BendFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_BendFail(i)),[0:0.01:Barlength])))) ;
+ShearStress_BendFail(i) = ((3/2) * (Max_Shear_BendFail(i)) )/ (WidthCS*FoamLength) ;
 
 end
 
@@ -88,18 +88,43 @@ MomentDiagram_BendFail = int(ShearDiagram_BendFail,x);
 
 
 %loop to get max 
-
+% remove ABS if you do not need the absloute value of max-min!
 for i =1:length(bShear)
     
-Max_Moment_ShearFail(i) = double(max(subs(MomentDiagram_ShearFail(i),[0:0.01:Barlength]))) ;
+Max_Moment_ShearFail(i) = double(max(abs(subs(MomentDiagram_ShearFail(i),[0:0.01:Barlength])))) ;
 
 end
 
 for i =1:length(bBend)
     
-Max_Moment_BendFail(i) = double(max(subs(MomentDiagram_BendFail(i),[0:0.01:Barlength]))) ;
+Max_Moment_BendFail(i) = double(max(abs(subs(MomentDiagram_BendFail(i),[0:0.01:Barlength])))) ;
 
 end
+
+
+%% Moment of Inertia: from centroidal axis.
+% the neutral axis is the z axis, thus moment about z axis for foam will be
+% just at the axis itself,
+
+InertiaFoam = (1/12)*( WidthCS )*(FoamLength)^3 ;
+InertiaBalsa = ((1/12)*(WidthCS)*(BalsaLength)^3 + ((FoamLength+BalsaLength)/2))*(WidthCS*BalsaLength) ;
+
+%% Max Normal Stress: Flexural Formula
+
+MaxNormalStress_BendFail = (Max_Moment_BendFail .* (BalsaLength+(FoamLength/2)))/ ( InertiaBalsa + (E_Foam/E_Bals)*InertiaFoam) ;
+MaxNormalStress_ShearFail = (Max_Moment_BendFail .* (BalsaLength+(FoamLength/2)))/ ( InertiaBalsa + (E_Foam/E_Bals)*InertiaFoam) ;
+
+%% Max Shear Stress: Shear Formula
+
+% the ShearStress_BendFail takes the whole area instead of half, double
+% check.
+
+
+MaxShearStress_BendFail = (3/2) * (Max_Shear_BendFail./((FoamLength/2)*WidthCS)) ;
+MaxShearStress_ShearFail = (3/2) * (Max_Shear_ShearFail./((FoamLength/2)*WidthCS)) ;
+
+%%
+
 
 %% get p(0), V, and M : DESIGN
 
