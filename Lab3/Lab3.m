@@ -106,8 +106,11 @@ end
 % the neutral axis is the z axis, thus moment about z axis for foam will be
 % just at the axis itself,
 
+CentroidShape = ((FoamLength+(2*BalsaLength))/2) ;
+CnetroidTopBalsa = ( (FoamLength + BalsaLength) + BalsaLength/2 );
+
 InertiaFoam = (1/12)*( WidthCS )*(FoamLength)^3 ;
-InertiaBalsa = ((1/12)*(WidthCS)*(BalsaLength)^3 + ((FoamLength+BalsaLength)/2))*(WidthCS*BalsaLength) ;
+InertiaBalsa = ((1/12)*(WidthCS)*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 )*(WidthCS*BalsaLength) ;
 
 %% Max Normal Stress: Flexural Formula
 
