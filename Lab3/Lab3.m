@@ -115,28 +115,42 @@ InertiaBalsa = ((1/12)*(WidthCS)*(BalsaLength)^3 + ( CentroidShape - CnetroidTop
 %% Max Normal Stress: Flexural Formula
 
 MaxNormalStress_BendFail = (Max_Moment_BendFail .* (BalsaLength+(FoamLength/2)))/ ( InertiaBalsa + (E_Foam/E_Bals)*InertiaFoam) ;
-MaxNormalStress_ShearFail = (Max_Moment_BendFail .* (BalsaLength+(FoamLength/2)))/ ( InertiaBalsa + (E_Foam/E_Bals)*InertiaFoam) ;
+MaxNormalStress_ShearFail = (Max_Moment_ShearFail .* (BalsaLength+(FoamLength/2)))/ ( InertiaBalsa + (E_Foam/E_Bals)*InertiaFoam) ;
+
+MinNormStressBendFail = min(MaxNormalStress_BendFail);
+MinNormStressShearFail = min(MaxNormalStress_ShearFail);
+
+% they're both the same, it's sample 10;
+
+MaxAllowNormal = min([MinNormStressBendFail;MinNormStressShearFail])./1.3 ; 
 
 %% Max Shear Stress: Shear Formula
 
 % the ShearStress_BendFail takes the whole area instead of half, double
 % check.
 
+%we checked, it's the full area.
 
-MaxShearStress_BendFail = (3/2) * (Max_Shear_BendFail./((FoamLength/2)*WidthCS)) ;
-MaxShearStress_ShearFail = (3/2) * (Max_Shear_ShearFail./((FoamLength/2)*WidthCS)) ;
+
+MaxShearStress_BendFail = (3/2) * (Max_Shear_BendFail./((FoamLength)*WidthCS)) ;
+MaxShearStress_ShearFail = (3/2) * (Max_Shear_ShearFail./((FoamLength)*WidthCS)) ;
+
+MinShearStressBendFail = min(MaxShearStress_BendFail);
+MinShearStressShearFail = min(MaxShearStress_ShearFail);
+
+MaxAllowShear = min([MinShearStressBendFail;MinShearStressShearFail])./1.3 ; 
 
 %%
 
 
 %% get p(0), V, and M : DESIGN
 
-%{
 syms p0 x
 qx = 4*p0 * sqrt ( 1 - ((2*x)/Barlength)^2) ;
 
 %get V
-Vx = int(qx,p0,x);
+Vx = int(qx,(-L/2),x);
+
 Mx = int(Vx,p0,x);
 
 % F = int(q(c),c,-l/2,l/2)
