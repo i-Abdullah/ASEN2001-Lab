@@ -217,7 +217,7 @@ end
 
 %all of them are 0 here but this needs to be checked later.
 
-PickedAllow = mean(MaxShearStress_ShearFail(5))/FOS;
+PickedAllow = (MaxShearStress_ShearFail(5)/2)/FOS;
 
 % determine which width of the beam you have picked:
 
@@ -280,6 +280,12 @@ If = (1/12)*(FoamLength)^3 ;
 Ib = 2*((1/12)*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 *BalsaLength);
 
 Width_Moment_Function = Mx_WithP0 * (BalsaLength+(FoamLength/2))/((Ib + (E_Foam/E_Bals).*If)*MaxAllowNormal);
+Width_Shear_Function = (((MaxAllowShear*(2/3))/(Vx_WithP0))^-1)/(FoamLength);
+
+fplot(Width_Moment_Function)
+hold on
+fplot(Width_Shear_Function)
+
 
 % EquationWidth = MaxAllowNormal == -(Mx_WithP0' .* (BalsaLength+(FoamLength/2)))./ ( Ib + (E_Foam/E_Bals).*If) ;
 % 
