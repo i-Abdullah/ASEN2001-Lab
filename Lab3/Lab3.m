@@ -19,23 +19,40 @@ eighteen_in_bar = 3.92 ; %N 18 inch bar
 LengthCS = 0.0206375; %in meter.
 %% read test data:
 
+% read file
 [ TestData Comments ] = xlsread('TestData.xlsx');
+
+%get the comments as strings to see how it failed.
 FailType = cellstr(Comments(2:length(Comments),6));
 
 % Check if you failing bending or shear
 
 % the contains is case-sensitive;
 BendFail = contains(FailType,{'Bending','bending'});
-ShearFail = contains(FailType,{'Shear','shear','perpendicular'});
+ShearFail = contains(FailType,{'Shear','shear','perpendicular','both'});
 
+
+%% excludeds :
+
+% test 7 is excluded, no breakage
+% test 11 : no comment
+
+%% 
 % get the exact data related to bend and ehar
 
 BendData = TestData(BendFail,:);
 ShearData = TestData(ShearFail,:);
 
-% stuff that are in gray area, where they might be shear or moment fail.
+%% add data manually:
 
-% get the length of the middle bar b:
+%{
+if some if borken on both shear and moment or might be shear but is
+reported as moment, it should be added manually.
+
+%}
+
+
+%% get the length of the middle bar b:
 
 Barlength = 36*0.0254 ; % in m
 bBend = (Barlength) - 2*BendData(:,3); % in meter
@@ -46,6 +63,9 @@ BalsaLength = 1/32 * 0.0254 ; % in m
 WidthCS = 4 * 0.0254; %in m CS = Cross-section
 WidthCSBendData = BendData(:,4);
 WidthCSShearData = ShearData(:,4);
+
+
+
 
 
 %% Shear/moment daiagram : TEST DATA
@@ -151,7 +171,7 @@ for i=1:r
     
 end
 
-%Largest moment
+%Largest shear
 [ r c ] = size(ShearData) ;
 for i=1:r
     
@@ -161,7 +181,9 @@ for i=1:r
         
     elseif ShearData(i,3) <= ShearData(i,5) && ShearData(i,5) < ShearData(i,3)+ShearData(i)
         
-       Vfail(i) = 0;
+       Vfail(i) = ShearData(i,2)/2; % It should be 0 but they didn't account
+       %for the strap in the test, so we will just use the value before it.
+       %Because there's no way it'll break @ 0 shear.
 
     else
         
@@ -171,7 +193,10 @@ for i=1:r
     
     
 end
+
+
 %% Moment of Inertia: from centroidal axis.
+
 % the neutral axis is the z axis, thus moment about z axis for foam will be
 % just at the axis itself,
 
@@ -208,7 +233,7 @@ MaxAllowNormal = mean(MaxNormalStress_BendFail)./ FOS ;
 %we checked, it's the full area.
 
 for i=1:length(Vfail)
-MaxShearStress_ShearFail = (3/2) * (Vfail'./((FoamLength).*ShearData(i,4))) ;
+MaxShearStress_ShearFail = (3/2) * (abs(Vfail)'./((FoamLength).*ShearData(i,4))) ;
 end
 
 %remove outlayers
@@ -217,8 +242,9 @@ end
 
 %all of them are 0 here but this needs to be checked later.
 
-PickedAllow = (MaxShearStress_ShearFail(5));
+PickedAllow = min(MaxShearStress_ShearFail);
 
+%{
 % determine which width of the beam you have picked:
 
 if isnumeric(find(MaxShearStress_ShearFail == PickedAllow))==1
@@ -230,6 +256,8 @@ else
     PickedWidth = find(MaxShearStress_BendFail == PickedAllow);
     
 end
+
+%}
 
 MaxAllowShear = ( PickedAllow /1.3); 
 
@@ -256,7 +284,9 @@ Mx = int(Vx,x,(-Barlength/2),x);
 % what's stored as WidthCS;
 
 If = (1/12).*( WidthCS ).*(FoamLength)^3 ;
-Ib = 2*((1/12).*(WidthCS).*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 ).*(WidthCS.*BalsaLength) ;
+
+%we had to mulyiply by 2 to make it work, check why:
+Ib = 2*((1/12).*(WidthCS).*(BalsaLength)^3 + ( CentroidShape - 2*CnetroidTopBalsa ) ^2 ).*(WidthCS.*BalsaLength) ;
 
 
 
@@ -279,43 +309,44 @@ Cvalue = (BalsaLength+(FoamLength/2));
 If = (1/12)*(FoamLength)^3 ;
 Ib = 2*((1/12)*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 *BalsaLength);
 
+
 Width_Moment_Function = Mx_WithP0 * (BalsaLength+(FoamLength/2))/((Ib + (E_Foam/E_Bals).*If)*MaxAllowNormal);
 Width_Shear_Function = (((MaxAllowShear*(2/3))/(Vx_WithP0))^-1)/(FoamLength);
-%Width_Shear_Function22 = diff(Mx_WithP0,x);
-%Width_Shear_Function2 = (((MaxAllowShear*(2/3))/(Width_Shear_Function22))^-1)/(FoamLength);
+
+%loop over the two plots to get width function
+j = 1; %index of storing
+for i=(-Barlength/2):0.01:(Barlength/2)
+    %width is maximum of both graphs of shear and moment
+    WidthFunction(j) = max(abs(subs(Width_Moment_Function,i)), abs(subs(Width_Shear_Function,i)));
+    iValues(j) = i; %store x values
+    j = j+1;
+end
+
+WidthFunction = WidthFunction/2;
+%Just to half the width because it gives us width for full span of 4 inches
+% and we're doing half top and half bottom.
+
+ForCut = double([ iValues' WidthFunction' ]);
+% this just for us to cut the wing in practice.
+
+ForCut = ForCut * 100 ; %convert
+%% plotting
 
 figure(1)
 fplot(Width_Moment_Function)
 hold on
 fplot(Width_Shear_Function)
+legend('Width function for moment', 'Width function for shear');
+grid minor
+hold off
 
-%loop over the two plots to get width function
-j = 1;
-for i=(-Barlength/2):0.01:(Barlength/2)
-    WidthFunction(j) = max(abs(subs(Width_Moment_Function,i)), abs(subs(Width_Shear_Function,i)));
-    j = j+1;
-end
 
 figure(2);
-plot(WidthFunction)
+plot(iValues,WidthFunction)
 hold on
-plot(-WidthFunction)
+plot(iValues,-WidthFunction)
+title('Width function');
+xlabel('Length')
+ylabel('Width')
+hold on
 grid minor
-% EquationWidth = MaxAllowNormal == -(Mx_WithP0' .* (BalsaLength+(FoamLength/2)))./ ( Ib + (E_Foam/E_Bals).*If) ;
-% 
-% Width_Moment_Function = solve(EquationWidth,WidthBend);
-% 
-% 
-% 
-% syms WidthBend
-% If = (1/12).*( WidthBend ).*(FoamLength)^3 ;
-% Ib = 2*((1/12).*(WidthBend).*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 ).*(WidthBend.*BalsaLength) ;
-% 
-% EquationWidth = MaxAllowNormal == -(Mx_WithP0' .* (BalsaLength+(FoamLength/2)))./ ( Ib + (E_Foam/E_Bals).*If) ;
-% 
-% Width_Moment_Function = solve(EquationWidth,WidthBend);
-% 
-% Width_Shear_Function = (min([MinShearStressShearFail])/(Vx_WithP0*(3/2)) )/(FoamLength) ;
-% width
-
-%}
