@@ -350,3 +350,31 @@ xlabel('Length')
 ylabel('Width')
 hold on
 grid minor
+
+%% Determine the testing 
+
+
+% Loading function
+
+syms x
+Px = p0Value  * sqrt(1-(2*x/Barlength)^2);
+ItegralBounds = 0:(Barlength/8):(Barlength/2);
+% Integrate the weighted x values as well as the function
+for i = 1:length(ItegralBounds)-1
+    wint(i) = int(Px*x,x,ItegralBounds(i),ItegralBounds(i+1));
+    nwint(i) = int(Px,x,ItegralBounds(i),ItegralBounds(i+1));
+    centroid(i) = wint(i)/nwint(i);
+end
+
+
+l1 = centroid(2)-centroid(1);
+l2 = ((nwint(1)+Sleeve+(.5*six_in_bar))*l1)/((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar)));
+l3 = centroid(4)-centroid(3);
+l4 = ((nwint(3)+Sleeve+(.5*six_in_bar))*l3)/((nwint(3)+Sleeve+(.5*six_in_bar))+(nwint(4)+Sleeve+(.5*six_in_bar)));
+
+l5 = (centroid(4)-l4)-(centroid(2)-l2);
+
+l6 = (((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar))+(.5*twelve_in_bar))*l5)/((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))+((nwint(3)+Sleeve+(.5*six_in_bar))+(nwint(4)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))));
+
+
+
