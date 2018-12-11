@@ -70,7 +70,9 @@ WidthCSShearData = ShearData(:,4);
 
 %% Shear/moment daiagram : TEST DATA
 
-%{
+
+% the purpose of this is just to plot.
+
 
 % do the shear/moment daiagrams for shear fail
 
@@ -110,9 +112,8 @@ Max_Shear_BendFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_BendFail(i)),[
 end
 
 %moment daiagarams = 
-MomentDiagram_ShearFail1 = int(ShearDiagram_ShearFail,x,BendData(1,3),bBend(1)+ BendData(1,3));
-MomentDiagram_ShearFail2 = int(ShearDiagram_ShearFail,x,BendData(1,3),bBend(1)+ BendData(1,3));
-MomentDiagram_BendFail = int(ShearDiagram_BendFail,x)
+MomentDiagram_BendFail = int(ShearDiagram_BendFail,x);
+MomentDiagram_ShearFail = int(ShearDiagram_ShearFail,x);
 
 %not needed:
 %{
@@ -130,6 +131,9 @@ Max_Moment_BendFail(i) = double(max(abs(subs(MomentDiagram_BendFail(i),[0:0.01:B
 
 end
 %}
+%% PLOT HERE
+
+
 
 
 %% Find Maximum moment: the moment at the location of faliure
@@ -311,7 +315,7 @@ Ib = 2*((1/12)*(BalsaLength)^3 + ( CentroidShape - CnetroidTopBalsa ) ^2 *BalsaL
 
 
 Width_Moment_Function = Mx_WithP0 * (BalsaLength+(FoamLength/2))/((Ib + (E_Foam/E_Bals).*If)*MaxAllowNormal);
-Width_Shear_Function = (((MaxAllowShear*(2/3))/(Vx_WithP0))^-1)/(FoamLength);
+Width_Shear_Function = (((MaxAllowShear*(3/2))/(Vx_WithP0))^-1)/(FoamLength);
 
 %loop over the two plots to get width function
 j = 1; %index of storing
@@ -376,5 +380,10 @@ l5 = (centroid(4)-l4)-(centroid(2)-l2);
 
 l6 = (((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar))+(.5*twelve_in_bar))*l5)/((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))+((nwint(3)+Sleeve+(.5*six_in_bar))+(nwint(4)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))));
 
+%% theortical:
 
+% how much force we excpect the wing to handle.
 
+MaxNormalForce = MaxAllowNormal * LengthCS * WidthCS;
+
+MaxShearForce = MaxAllowShear * LengthCS * WidthCS;
