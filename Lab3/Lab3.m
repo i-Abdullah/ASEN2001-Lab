@@ -1,3 +1,33 @@
+% info:
+
+%{
+
+This codes is part of CU's ASEN 2001: Statics and Structures 
+
+ This lab is concerned with the analysis and design of composite beams.
+Beams are frequently used componentsin aerospace structures, such as wings,
+booms, etc. To reduce their weight and to tailor their stiffness and strength
+toparticular loading conditions, beams are often made of several materials.
+Such beams are called composite beams. Incomparison with truss structures,
+the structural response of beams can be rather complex and various forms of
+failureneed to be carefully considered in the design process.
+
+This code will take Test data for the the strength of the beam and get the
+faliure normal and shear stresses and then plot optimal width function for
+that beam, for more info read The files in AssignmentInfo . 
+
+Done by:
+
+- Ryan Hughes
+- Roland Bailey
+- Will Faulkner
+- Johann Kailey-Steiner
+- Abdulla Al Ameri
+
+
+
+%}
+
 %% Housekeeping
 
 clear;
@@ -94,8 +124,10 @@ Max_Moment_BendFail = zeros(1,length(bBend));
 for i =1:length(bShear)
 syms x
 ShearDiagram_ShearFail{i} = piecewise ( 0<x<ShearData(i,3) , ShearData(i,2)/2 , ShearData(i,3)<x<bShear(i)+ShearData(i,3) , 0 , bShear(i)+ShearData(i,3)<x<Barlength , -ShearData(i,2)/2 );
-Max_Shear_ShearFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_ShearFail(i)),[0:0.01:Barlength])))) ;
+Max_Shear_ShearFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_ShearFail(i)),[0:0.01:Barlength]))));
+MomentDiagram_ShearFail(i) = piecewise ( 0<x<ShearData(i,3) , ShearData(i,2)/2 * x, ShearData(i,3)<x<bShear(i)+ShearData(i,3) , ShearData(i,3) * ShearData(i,2)/2 , bShear(i)+ShearData(i,3)<x<Barlength , (-ShearData(i,2)/2 * (x-Barlength)));
 %ShearStress_ShearFail(i) = ((3/2) * (Max_Shear_ShearFail(i)) )/ (WidthCS*FoamLength) ;
+
 
 end
 
@@ -107,13 +139,12 @@ for i =1:length(bBend)
 syms x
 ShearDiagram_BendFail{i} = piecewise ( 0<x<BendData(i,3) , BendData(i,2)/2 , BendData(i,3)<x<bBend(i)+ BendData(i,3) , 0 , bBend(i)+BendData(i,3)<x<Barlength , -BendData(i,2)/2 );
 Max_Shear_BendFail(i) = double(max(abs(subs(cell2sym(ShearDiagram_BendFail(i)),[0:0.01:Barlength])))) ;
+MomentDiagram_BendFail(i) = piecewise ( 0<x<BendData(i,3) , BendData(i,2)/2 * x, BendData(i,3)<x<bBend(i)+ BendData(i,3) ,  BendData(i,3) * BendData(i,2)/2 , bBend(i)+BendData(i,3)<x<Barlength , (-BendData(i,2)/2 * (x-Barlength)));
 %ShearStress_BendFail(i) = ((3/2) * (Max_Shear_BendFail(i)) )/ (WidthCS*FoamLength) ;
 
 end
 
-%moment daiagarams = 
-MomentDiagram_BendFail = int(ShearDiagram_BendFail,x);
-MomentDiagram_ShearFail = int(ShearDiagram_ShearFail,x);
+%moment diagrams = 
 
 %not needed:
 %{
@@ -132,7 +163,33 @@ Max_Moment_BendFail(i) = double(max(abs(subs(MomentDiagram_BendFail(i),[0:0.01:B
 end
 %}
 %% PLOT HERE
+figure(1)
+fplot(MomentDiagram_BendFail, [0, 1])
+title('Moment Diagrams for Bending Failure')
+xlabel('Distance (m)')
+ylabel('Force (N)')
+grid minor
 
+figure(2)
+fplot(ShearDiagram_BendFail, [0, 1])
+title('Shear Diagrams for Bending Failure')
+xlabel('Distance (m)')
+ylabel('Force (N)')
+grid minor
+
+figure(3)
+fplot(MomentDiagram_ShearFail, [0, 1])
+title('Moment Diagrams for Shear Failure')
+xlabel('Distance (m)')
+ylabel('Force (N)')
+grid minor
+
+figure(4)
+fplot(ShearDiagram_ShearFail, [0, 1])
+title('Shear Diagrams for Shear Failure')
+xlabel('Distance (m)')
+ylabel('Force (N)')
+grid minor
 
 
 
@@ -336,16 +393,21 @@ ForCut = double([ iValues' WidthFunction' ]);
 ForCut = ForCut * 100 ; %convert
 %% plotting
 
-figure(1)
+figure(5)
 fplot(Width_Moment_Function)
 hold on
 fplot(Width_Shear_Function)
-legend('Width function for moment', 'Width function for shear');
+hold on
+fplot(-Width_Shear_Function)
+legend('Moment Diagram', 'Shear Diagram','Shear Diagram');
+title('Shear and Moment Diagrams for the beam')
+xlabel('Width (m)')
+ylabel('Length (m)')
 grid minor
 hold off
 
 
-figure(2);
+figure(6);  
 plot(iValues,WidthFunction)
 hold on
 plot(iValues,-WidthFunction)
@@ -370,7 +432,7 @@ for i = 1:length(ItegralBounds)-1
     centroid(i) = wint(i)/nwint(i);
 end
 
-
+%location of straps
 l1 = centroid(2)-centroid(1);
 l2 = ((nwint(1)+Sleeve+(.5*six_in_bar))*l1)/((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar)));
 l3 = centroid(4)-centroid(3);
@@ -380,7 +442,7 @@ l5 = (centroid(4)-l4)-(centroid(2)-l2);
 
 l6 = (((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar))+(.5*twelve_in_bar))*l5)/((nwint(1)+Sleeve+(.5*six_in_bar))+(nwint(2)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))+((nwint(3)+Sleeve+(.5*six_in_bar))+(nwint(4)+Sleeve+(.5*six_in_bar)+(.5*twelve_in_bar))));
 
-%% theortical:
+%% Theoretical:
 
 % how much force we excpect the wing to handle.
 
